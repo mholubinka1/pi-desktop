@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    network_mode: none
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --debug --label-enable --cleanup --schedule "0 0 3 * * ?"
+    restart: always
+  hueshift2:
+    depends_on:
+      - watchtower
+    container_name: hueshift2
+    image: mholubinka1/hueshift2:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "6454:6454/udp"
+      - "6454:6454"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - /home/pi/.config/hueshift2:/config
+      - /home/pi/.log/hueshift2:/log
+    restart: unless-stopped
+  plex:
+    depends_on:
+      - watchtower
+    container_name: plex-server
+    image: greensheep/plex-server-docker-rpi:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    network_mode: host
+    volumes: 
+      - /mnt/pi-media/plexdata/config:/config
+      - /mnt/pi-media/plexdata/transcode:/transcode
+      - /mnt/pi-media/Media/Live:/data/live
+      - /mnt/pi-movies/Movies:/data/movies
+      - /mnt/pi-media/Media/TV:/data/tv
+      - /mnt/pi-music/Music:/data/music
+    restart: always
+    privileged: true
