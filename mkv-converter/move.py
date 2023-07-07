@@ -18,7 +18,7 @@ class Copier:
     def extract_title_and_year(self, file):
         pattern = r'^(.*?)(\d{4})'
         match = re.search(pattern, file)
-        return match.group(1), match.group(2)
+        return match.group(1).title(), match.group(2)
     
     def extract_tv_info(self, file):
         pattern = r'^(.+?)[\.]?([sS]\d{2}[eE]\d{2})'
@@ -26,6 +26,7 @@ class Copier:
         tv_show = match.group(1)
         tv_show = re.sub(r'[^a-zA-Z0-9\s]', ' ', tv_show)
         tv_show = re.sub(r'\s+', ' ', tv_show).strip()
+        tv_show = tv_show.title()
         episode_code = match.group(2)
         return tv_show, episode_code[1:3], episode_code[4:6]
 
